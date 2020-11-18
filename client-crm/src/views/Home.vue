@@ -1,18 +1,24 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+    <div class="app-page-container">
+        <div class="page-title">
+            <h2>Главная</h2>
+            <hr>
+        </div>
+        <section class="app-table">
+        </section>
+    </div>
 </template>
-
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
+import axios from 'axios'
 export default {
-  name: 'Home',
-  components: {
-    HelloWorld
-  }
+    name: 'Home',
+    mounted(){
+       axios
+        .create({baseURL:'http://localhost:5000'})
+        .get('/user', { headers : { token : localStorage.getItem('token')}})
+        .then(res => {
+            console.log(res)
+        })
+    }
 }
 </script>
