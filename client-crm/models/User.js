@@ -2,11 +2,14 @@ const mongosee = require('mongoose');
 const Schema = mongosee.Schema;
 
 const userSchema = new Schema({
-    name: String,
-    email: {
-        unique: true,
-        type: String
-    },
+    userInfo:{name:String,email:{unique:true,type:String}},
+        
+    //       name: String,
+    //       email:{
+    //         unique: true,
+    //         type: String
+    //       }
+    // },
     password: String
 })
 
