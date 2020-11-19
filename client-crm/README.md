@@ -9,6 +9,10 @@ npm install
 ```
 npm run serve
 ```
+### Start nodemon server
+```
+npm run start
+```
 
 ### Compiles and minifies for production
 ```
