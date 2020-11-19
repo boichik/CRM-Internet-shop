@@ -1,23 +1,49 @@
 <template>
 	<div class="center">
 		<h1>Вход</h1>
-		<form action="post">
+		<form @submit.prevent="submitHandler">
             <div class="input-field inline">
-                <input id="email_inline" type="email" class="validate">
+                <input 
+                   id="email_inline" 
+                   type="email" 
+                   class="validate"
+                   v-model.trim="email"
+                   :class="{invalid: ($v.email.$dirty && !$v.email.required) || ($v.email.$dirty && !$v.email.email)}"
+                >
                 <label for="email_inline">Email</label>
-                <span class="helper-text" data-error="wrong" data-success="right">Введите емейл</span>
+                <span 
+                    v-if="$v.email.$dirty && !$v.email.email"
+                    class="helper-text invalid left"
+                >Введите коректный емейл</span>
+                <span 
+                    v-if="$v.email.$dirty && !$v.email.required"
+                    class="helper-text invalid left"
+                >Поле емейл не должно быть пустым</span>
             </div>
             <div class="input-field inline">
-                <input id="pass_inline" type="password" class="validate">
+                <input 
+                   id="pass_inline"
+                   type="password"
+                   class="validate"
+                   v-model="password"
+                   :class="{invalid: ($v.password.$dirty && !$v.password.required) || ($v.password.$dirty && !$v.password.minLength)}"
+                >
                 <label for="pass_inline">Пароль</label>
-                <span class="helper-text" data-error="wrong" data-success="right">Введите пароль</span>
+                <span 
+                    v-if="$v.password.$dirty && !$v.password.required"
+                    class="helper-text invalid left"
+                >Введите коректный пароль</span>
+                <span 
+                    v-if="$v.password.$dirty && !$v.password.minLength"
+                    class="helper-text invalid left"
+                >Длина пароля должена быть {{$v.password.$params.minLength.min}} символов. Сейчас {{password.length}}</span>
             </div>
-			<div class="fpass">Забыли пароль?</div>
+			<div class="fpass"><router-link to="/recovery">Забыли пароль?</router-link></div>
 			<button class="btn waves-effect waves-light btn-register" type="submit" name="action">Войти
             </button>
 			<div class="link">
 				Нет аккаунта?
-				<a href="#">Зарегистрироваться</a>
+				<router-link to="/register">Зарегистрироваться</router-link>
 			</div>
 		</form>
 	</div>
@@ -25,6 +51,8 @@
 <script>
 import axios from 'axios'
 import { request } from 'http'
+
+import  {email, required, minLength} from 'vuelidate/lib/validators'
 export default {
     name: 'Login',
     data(){
@@ -33,21 +61,27 @@ export default {
             password:''
         }
     },
+    validations:{
+      email:{email, required},
+      password:{required, minLength: minLength(8)}
+    },
     methods:{
-        login(){
-            const user ={
+       async submitHandler(){
+           if(this.$v.$invalid){
+               this.$v.$touch()
+                   return
+               
+           }
+           const user ={
                 email:this.email,
                 password:this.password
             }
-            axios
-             .create({baseURL:'http://localhost:5000'})
-             .post('/login', user)
-             .then(res => {
-                    localStorage.setItem('token', res.data.token);
-                    this.$router.push('/')
-                }, err =>{
-                    console.log(err)
-                })
+            try{
+               await this.$store.dispatch('login', user).then(()=>this.$router.push('/'))            
+            }
+            catch(e){
+                console.log(e)
+            }  
         }
     }
 }

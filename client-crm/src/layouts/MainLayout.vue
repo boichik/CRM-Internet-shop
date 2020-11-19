@@ -1,11 +1,5 @@
 <template>
     <div>
-      <ul id="dropdown1" class="dropdown-content">
-	  <li><a href="#!">one</a></li>
-	  <li><a href="#!">two</a></li>
-	  <li class="divider"></li>
-	  <li><a href="#!">three</a></li>
-	</ul>
 
 	<!-- NAVBAR -->
     <Navbar @click="isOpen = !isOpen"/>
@@ -28,6 +22,11 @@ export default {
     data:()=>({
       isOpen:true
     }),
+    async mounted(){
+      if(!Object.keys(this.$store.getters.info).length){
+        await this.$store.dispatch('fetchInfo')
+      }
+    },
     components:{
         Navbar, Sidebar
     }

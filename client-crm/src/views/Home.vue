@@ -13,12 +13,6 @@ import axios from 'axios'
 export default {
     name: 'Home',
     mounted(){
-       axios
-        .create({baseURL:'http://localhost:5000'})
-        .get('/user', { headers : { token : localStorage.getItem('token')}})
-        .then(res => {
-            console.log(res)
-        })
     }
 }
 </script>
