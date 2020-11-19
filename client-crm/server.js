@@ -17,8 +17,10 @@ app.use(bodyParser.urlencoded({extended: false}));
 // Routes
 app.post('/register', (req, res, next) =>{
     const newUser =new User({
-        email : req.body.email,
-        name: req.body.name,
+        userInfo:{
+            email : req.body.email,
+            name: req.body.name     
+        },
         password: bcrypt.hashSync(req.body.password,10)
     })
     newUser.save(err =>{
@@ -35,7 +37,7 @@ app.post('/register', (req, res, next) =>{
 })
 
 app.post('/login', (req, res, next) =>{
-    User.findOne({email : req.body.email}, (err,user)=>{
+    User.findOne({"userInfo.email" : req.body.email}, (err,user)=>{
         if(err) return res.status(500).json({
             title:'server error',
             error: err
@@ -67,7 +69,10 @@ app.get('/user', (req, res, next) =>{
         })
         User.findOne( {_id: decoded.userId}, (err, user)=> {
             if(err) return console.log(err)
-            console.log(user)
+            return res.status(200).json({
+                title: 'user grabbed',
+                user
+            })
         })
     })
 })
