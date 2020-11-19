@@ -84,6 +84,12 @@ table{width: 100%;}
 .nav{
 	height: 64px;
 }
+.nav ul a{
+	margin: 0;
+}
+.drop-li{
+	margin-right: 40px;
+}
 .drop-link{
   display: block;
 }
@@ -208,7 +214,9 @@ table{width: 100%;}
 .pag-table{
 	padding-bottom: 10px;
 }
-
+.input-field .invalid{
+	color: red;
+}
 .ml-1{margin-left: 10px;}
 .ml-2{margin-left: 20px;}
 .ml-3{margin-left: 30px;}
@@ -221,6 +229,9 @@ table{width: 100%;}
 .mr-4{margin-right: 40px;}
 .mr-5{margin-right: 50px;}
 
+.txt-red{color:red}
+.txt-green{color:green}
+.txt-blue{color:blue}
 
 
 @media (max-width: 768px){
