@@ -1,7 +1,7 @@
 const mongosee = require('mongoose');
 const Schema = mongosee.Schema;
 
-const goodSchema = new Schema({
+const orderSchema = new Schema({
     user_id:String,
     order_date: String,
     costs:Number,
@@ -13,5 +13,5 @@ const goodSchema = new Schema({
     comment:String
 })
 
-const Good = mongosee.model('Good', goodSchema);
-module.exports =Good;
+const Order = mongosee.model('Order', orderSchema);
+module.exports =Order;

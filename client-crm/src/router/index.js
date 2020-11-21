@@ -66,6 +66,12 @@ const routes = [
     name: 'goods',
     meta: {layout: 'main', auth:true},
     component: () => import('../views/Goods.vue')
+  },
+  {
+    path: '/testg',
+    name: 'testgood',
+    meta: {layout: 'main', auth:true},
+    component: () => import('../views/TestGood.vue')
   }
 
 ]

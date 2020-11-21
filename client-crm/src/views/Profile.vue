@@ -11,5 +11,9 @@
 <script>
 export default {
     name: 'Profile',
+    data: ()=>({
+
+    }),
+
 }
 </script>

@@ -115,7 +115,6 @@ export default {
                 password:this.password
             }
           await this.$axios.create({baseURL:'http://localhost:5000'}).post('/register', newUser).then(res =>{
-                 console.log(res)
                  this.$router.push('/login')
                 }, err =>{
                  console.log(err)

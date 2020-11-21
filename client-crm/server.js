@@ -9,7 +9,7 @@ const { time } = require('console');
 
 // Схемы моделей данных
 const User = require('./models/User');
-const Good = require('./models/Good');
+const Order = require('./models/Order');
 const Costumer = require('./models/Costumer')
 
 
@@ -107,7 +107,7 @@ app.get('/user', (req, res, next) =>{
 
 
 // Добавить заказ
-app.post("/api/addGood", (req, res, next) =>{
+app.post("/api/addOrder", (req, res, next) =>{
     // Поиск пользователя по API ключе
     User.findOne({"userInfo.api_key": req.body.API_KEY}, (err, user)=>{
         if(!user) return res.status(401).json({
@@ -116,7 +116,7 @@ app.post("/api/addGood", (req, res, next) =>{
         })
         const user_id=user._id; // Сохраняем id юзера
         //Ищем по номеру телефона клиента в базе
-        Costumer.findOne({"phone":req.body.good.phone}, (err,costumer)=>{
+        Costumer.findOne({"phone":req.body.order.phone}, (err,costumer)=>{
             if(err){
                 return res.status(500).json({
                     title:'server_error',
@@ -124,20 +124,20 @@ app.post("/api/addGood", (req, res, next) =>{
                 })
             }           
             // Создаем новый объект с заказом
-            const newGood = new Good({
+            const newOrder = new Order({
                 user_id:user_id,
-                order_date: req.body.good.order_date,
-                costs:req.body.good.costs,
-                article_goods:req.body.good.article_goods,
-                count:req.body.good.count,
+                order_date: req.body.order.order_date,
+                costs:req.body.order.costs,
+                article_orders:req.body.order.article_orders,
+                count:req.body.order.count,
                 status:[
-                    {status_now:"placed_order", changes_date:req.body.good.order_date, comnt:"-"}],    
-                delivery:req.body.good.delivery,
-                comment:req.body.good.comment
+                    {status_now:"placed_order", changes_date:req.body.order.order_date, comnt:"-"}],    
+                delivery:req.body.order.delivery,
+                comment:req.body.order.comment
             })
-            const goodId = newGood._id
+            const OrderId = newOrder._id
             // Отправляет заказ в базу
-            newGood.save(err =>{
+            newOrder.save(err =>{
                 if(err){
                     return res.status(500).json({
                         title: 'server_error',
@@ -147,15 +147,13 @@ app.post("/api/addGood", (req, res, next) =>{
             })
           // Если клиента с таким номером не существует создаем нового
           if(!costumer){
-              console.log("costumer is not defined")
-
             // Создаем новый объект с клиентом
             const newCostumer = new Costumer({
                 user_id:user_id,
-                bio:req.body.good.bio,
-                phone:req.body.good.phone,
-                email:req.body.good.email,
-                orders:[{order_id:goodId, address:req.body.good.address, order_bio:req.body.good.bio}]
+                bio:req.body.order.bio,
+                phone:req.body.order.phone,
+                email:req.body.order.email,
+                orders:[{order_id:OrderId, address:req.body.order.address, order_bio:req.body.order.bio}]
             })
             // Отправляем в базу
             newCostumer.save(err =>{
@@ -168,10 +166,8 @@ app.post("/api/addGood", (req, res, next) =>{
             })
           } 
           else{
-              console.log("costumer is")
-
             // Если клиент есть с таким номером телефона. Тогда обновляем список заказов данного клиента
-            costumer.updateOne({$push: {'orders' :{order_id:goodId, address: req.body.good.address, order_bio: req.body.good.bio}}}, (err)=>{
+            costumer.updateOne({$push: {'orders' :{order_id:OrderId, address: req.body.order.address, order_bio: req.body.order.bio}}}, (err)=>{
                 if(err){
                     return res.status(500).json({
                         title:'server_error',
@@ -188,12 +184,13 @@ app.post("/api/addGood", (req, res, next) =>{
             })
         }
         return res.status(200).json({
-            title:"good_add_in_succses"
+            title:"order_add_in_succses"
         }) 
         
     })
 })
 
+// Получить все заказы
 
 
 
