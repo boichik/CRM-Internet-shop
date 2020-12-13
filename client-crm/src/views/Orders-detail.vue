@@ -1,81 +1,69 @@
 <template>
     <div class="app-page-container">
         	<div class="page-title">
-				<h2>Заказы > 133</h2>
+				<h2><a @click="$router.go(-1)">Назад</a>>{{this.$route.params.id}}</h2>
 				<hr>
 			</div>
 			<section class="app-table">
-				<div class="detail-container">
-					<div class="detail-block green">
-	                  <p>Дата : 14.11.2020 13:20</p>
-	                  <p>Cумма : 133$</p>
-	                  <p>Артикул товара : 434345</p>
-	                  <p>Количество : 2</p>
-	                  <p>ФИО : Олександр Кущ</p>
-	                  <p>Телефон : +38099999000</p>
-	                  <p>Адресс : м. Киев, ул. Кущ 13</p>
-	                  <p>Доставка : НП</p>
-	                  <p>Коментарий : -</p>
-					</div>
-					<form class="detail-form">
-	                	  <div class="input-field col s12">
-						    <select>
-						      <option value="" disabled selected>Статус</option>
-						      <option value="1">Оформлен заказ</option>
-						      <option value="2">Обработан заказ</option>
-						      <option value="3">Отправлен</option>
-						      <option value="4">Доставка</option>
-						      <option value="5">Получен</option>
-						      <option value="6">Возврат</option>		           
-						      <option value="7">Отменён</option>		           
-						    </select>
-						    <label>Статус Заказа</label>
-						  </div>
-                          <div class="input-field  detail-input">
-					          <input id="last_name" type="text" class="validate">
-					          <label for="last_name">Коментарий</label>
-					      </div>
-					      <button class="waves-effect waves-light btn">Обновить<i class="material-icons right">refresh</i></button>
-	                </form>
-					<table class="detail-table">
-						<thead>
-							<tr>
-								<th>Дата</th>
-								<th>Статус</th>
-								<th>Коментарий</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<th>14.11.2020 13:20</th>
-								<th>Оформлен заказ</th>
-								<th>-</th>
-							</tr>
-							<tr>
-								<th>14.11.2020 14:00</th>
-								<th>Обработан заказ</th>
-								<th>-</th>
-							</tr>
-							<tr>
-								<th>14.11.2020 17:10</th>
-								<th>Отправлен</th>
-								<th>5800 9999 2311 233451</th>
-
-							</tr>
-							<tr>
-								<th>15.11.2020 9:00</th>
-								<th>Доставка</th>
-								<th>-</th>
-
-							</tr>
-							<tr>
-								<th>15.11.2020 18:00</th>
-								<th>Получен</th>
-								<th>-</th>
-							</tr>
-						</tbody>
-					</table>
+			<Loader v-if="loading"/>
+				<div v-else class="detail-container">
+                    <OdetailBlock :order="order"/>
+					<OdetailForm :status="status" :key="order.length + updateCount" @updateStatus="updateStatus"/>
+					<OdetailTable :status="status"/>
 				</div>
 			</section>
     </div>
 </template>
+<script>
+import OdetailBlock from "@/components/order-detail/OdetailBlock"
+import OdetailForm from "@/components/order-detail/OdetailForm"
+import OdetailTable from "@/components/order-detail/OdetailTable"
+
+export default {
+  name: 'order-detail',
+  data:()=>({
+	order:{},
+	costumer:[],
+	status:{},
+	updateCount: 0,
+	loading:true
+  }),	
+  async mounted(){
+	  this.createObject()		
+	  	
+  },
+  components:{
+	  OdetailBlock, OdetailForm, OdetailTable
+  },
+  methods:{
+	 async createObject(){
+			const id = this.$route.params.id
+			const order = await this.$store.dispatch('fetchOrdersById', id)
+			const cID= order.costumer_id
+			const costumer = await this.$store.dispatch('fetchCostumerById', cID)
+
+			this.order = {
+					...order,
+				//stNow: order.status[order.status.length-1].status_now,
+				statusColor : (order.status[order.status.length-1].status_now =='placed_order') ? 'orange' : 
+							(order.status[order.status.length-1].status_now =='order_processed') ? 'orange' : 
+							(order.status[order.status.length-1].status_now=='submitted') ? 'yellow' :
+							(order.status[order.status.length-1].status_now=='delivery') ? 'yellow' :
+							(order.status[order.status.length-1].status_now=='received') ? 'green' :
+							(order.status[order.status.length-1].status_now=='refund') ? 'blue' :
+																				'red',
+				
+				bio: costumer.orders.find(o => o.order_id === id).order_bio,
+				phone: costumer.phone,
+				adress: costumer.orders.find(c=> c.order_id === id).address
+				}
+			this.status= order.status
+			this.loading=false
+	  },
+	  updateStatus(){
+	      this.loading=true
+		  this.createObject()
+	  }
+  }
+}
+</script>

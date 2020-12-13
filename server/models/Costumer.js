@@ -3,6 +3,7 @@ const Schema = mongosee.Schema;
 
 const costumerSchema = new Schema({
     user_id:String,
+    costumer_id:String,
     bio:String,
     phone:Number,
     email:String,

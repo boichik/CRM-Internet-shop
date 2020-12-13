@@ -50,10 +50,34 @@ const routes = [
     component: () => import('../views/Orders-detail.vue')
   },
   {
-    path: '/documentation',
-    name: 'documentation',
+    path: '/clients-detail/:id',
+    name: 'clients-detail',
+    meta: {layout: 'main', auth:true},
+    component: () => import('../views/Clients-detail.vue')
+  },
+  {
+    path: '/goods-detail/:id',
+    name: 'goods-detail',
+    meta: {layout: 'main', auth:true},
+    component: () => import('../views/Goods-detail.vue')
+  },
+  {
+    path: '/api',
+    name: 'api',
     meta: {layout: 'main', auth:true},
     component: () => import('../views/Documentation.vue')
+  },
+  {
+    path: '/apiexample',
+    name: 'apiexample',
+    meta: {layout: 'main', auth:true},
+    component: () => import('../views/APIExample.vue')
+  },
+  {
+    path: '/wiki',
+    name: 'wiki',
+    meta: {layout: 'main', auth:true},
+    component: () => import('../views/Wiki.vue')
   },
   {
     path: '/profile',

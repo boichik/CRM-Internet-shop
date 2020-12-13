@@ -25,7 +25,7 @@ export default {
            {title:'Заказы', url:'/orders',ico:'local_grocery_store'},
            {title:'Товары', url:'/goods',ico:'assignment'},
            {title:'Клиенты', url:'/clients',ico:'people'},
-           {title:'API', url:'/documentation',ico:'brightness_5'},
+           {title:'API', url:'/api',ico:'brightness_5'},
            {title:'Профиль', url:'/profile',ico:'contacts'},
        ]
     })
