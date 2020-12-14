@@ -35,6 +35,16 @@ export default{
      } catch (e) {
        console.log(e)
      }
-   }  
+   },
+   async register({dispatch, commit}, newUser){
+     try{
+          await HTTP.post('/register', newUser)
+
+        }
+        catch(e){
+          console.log(e)
+        }
+   }
+
   }
 }

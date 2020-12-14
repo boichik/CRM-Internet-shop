@@ -340,7 +340,7 @@ app.get('/costumers', (req, res, next)=>{
                     title:"server_error",
                     error:err.message
                 })
-                if(costumers==!Array){
+                if(!costumers){
                    return res.status(404).json({
                        title:"costumers_not_found"
                    })

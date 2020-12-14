@@ -4,11 +4,12 @@ export default{
     actions:{
         async fetchCostumerById({dispatch, commit}, id){
             try {
-             const costumer = await HTTP.get(`/costumers/${id}`, {headers: { token: localStorage.getItem('token')}})
-                                        .then(res=>{
-                                          return res.data.costumer
-                                        })
-            return {...costumer}              
+                  const costumer = await HTTP.get(`/costumers/${id}`, {headers: { token: localStorage.getItem('token')}})
+                                            .then(res=>{
+                                              return res.data.costumer
+                                            })
+                    
+                  return {...costumer}              
               } catch (e) {
                 console.log(e)
               }
@@ -21,7 +22,7 @@ export default{
                                               })
                 return Object.keys(costumers).map(key => ({...costumers[key]}))             
               } catch (e) {
-                console.log(e)
+                console.log(e.response.status)
               }
           }
       }

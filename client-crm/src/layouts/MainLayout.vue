@@ -4,7 +4,7 @@
 	<!-- NAVBAR -->
     <Navbar @click="isOpen = !isOpen"/>
     <!-- SIDEBAR -->
-    <Sidebar v-model="isOpen"/>
+    <Sidebar v-model="isOpen" @mclick="isOpen = false"/>
     <!-- MAIN CONTENT -->
 
     <main class="app-content" :class="{max: !isOpen}">

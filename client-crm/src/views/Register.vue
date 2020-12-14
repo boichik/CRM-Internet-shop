@@ -114,11 +114,14 @@ export default {
                 email:this.email,
                 password:this.password
             }
-          await this.$axios.create({baseURL:'http://localhost:5000'}).post('/register', newUser).then(res =>{
-                 this.$router.push('/login')
-                }, err =>{
-                 console.log(err)
-            })
+            try{
+               await this.$store.dispatch('register', newUser).then(
+                    await this.$store.dispatch('login', newUser).then(()=>this.$router.push('/'))     
+               )       
+            }
+            catch(e){
+                console.log(e)
+            }  
            
         }
 
