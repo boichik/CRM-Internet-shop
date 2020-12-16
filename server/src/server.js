@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer');
+const dotevn = require('dotenv');
 const { time } = require('console');
 
 
@@ -17,10 +19,11 @@ const Report = require('../models/Report');
 
 
 const { result } = require('lodash');
+const { userInfo } = require('os');
 
-
+dotevn.config();
 // Присойдинение к базе данных
-mongoose.connect('mongodb+srv://crm_admin:123123123@cluster0.nutsf.mongodb.net/crm-internet-shop?retryWrites=true&w=majority',
+mongoose.connect(`mongodb+srv://${process.env.VAR_DB}@cluster0.nutsf.mongodb.net/crm-internet-shop?retryWrites=true&w=majority`,
                  { useNewUrlParser: true, useUnifiedTopology: true },
                   (err)=>{
                             if(err){
@@ -43,27 +46,37 @@ app.post('/register', (req, res, next) =>{
     // Генерируем значение для API
     const crypto = require("crypto");
     const id = crypto.randomBytes(20).toString('hex');
-    // Создаем новый объект с пользователем
-    const newUser =new User({
-        userInfo:{
-            email : req.body.email,
-            name: req.body.name,
-            api_key:id     
-        },
-        password: bcrypt.hashSync(req.body.password,10)
-    })
-    // Отправляем данные на базу
-    newUser.save(err =>{
-        if(err){
-            return res.status(400).json({
-                title: 'error',
-                error: 'email in use'
+    User.findOne({"userInfo.email" : req.body.email}, (err,user)=>{
+        if(err) throw err
+        if(!user){
+            // Создаем новый объект с пользователем
+            const newUser =new User({
+                userInfo:{
+                    email : req.body.email,
+                    name: req.body.name,
+                    api_key:id     
+                },
+                password: bcrypt.hashSync(req.body.password,10)
+            })
+            // Отправляем данные на базу
+            newUser.save(err =>{
+                if(err) res.status(500).json({
+                    title:'server_error'
+                })
+            })
+
+
+        }else{
+            return res.status(409).json({
+                title: 'email_in_use'
             })
         }
         return res.status(200).json({
-            title: 'register in sucsess'
+            title: 'register_sucsess'
         })
     })
+
+
 })
 
 // Вход в систему
@@ -76,7 +89,7 @@ app.post('/login', (req, res, next) =>{
             error: err
         })
         // Пользователя не найдено
-        if(!user) return res.status(401).json({
+        if(!user) return res.status(404).json({
             title:'user not found',
             error: 'invalid credentials'
         })
@@ -137,6 +150,39 @@ app.post('/user/name', (req,res,next)=>{
     })
 })
 
+// Изменить пароль пользователя
+app.post('/user/password', (req, res, next)=>{
+    const token = req.body.token;
+    const new_pass = bcrypt.hashSync(req.body.data.new_password,10)
+    //Верификация токена
+    jwt.verify(token, '1337', (err, decoded) =>{
+        if(err) return res.status(401).json({
+            title: 'unauthorized',
+            error: err
+        })
+        // Ищием пользователя по id и получаем информацию о нем
+        User.findOne( {_id: decoded.userId}, (err, user)=> {
+            if(err) return console.log(err)
+            if(!user) return res.status(404).json({
+                title:'user_not_found'
+            })
+            if(!bcrypt.compareSync(req.body.data.password, user.password)){
+                return res.status(409).json({
+                    title:'wrong_pass'
+                })
+            }
+            user.updateOne({'password' : new_pass}, (err)=>{
+                if(err) throw err
+                else return res.status(200).json({
+                    title:'update_pass_succses'
+                })
+            })
+        })
+    })
+
+})
+
+// Обновить отчет
 app.post('/reports/update', (req, res, next)=>{
     const token = req.body.token;
     //Верификация токена
@@ -192,6 +238,44 @@ app.post('/reports/update', (req, res, next)=>{
 
         })
         //.updateOne({'userInfo.lastReport' : req.body.formData.report_date})
+    })
+})
+
+// Востановление пароля
+app.post('/recovery', (req, res, next)=>{
+    const crypto = require("crypto");
+    const pass = crypto.randomBytes(10).toString('hex');
+    const crypPass = bcrypt.hashSync(pass,10)
+    User.findOne({"userInfo.email" : req.body.email}, (err,user)=>{
+        if(err) throw err
+        if(!user) return res.status(404).json({
+            title:'user_not_found'
+        })      
+    })
+    .updateOne({'password' : crypPass})   
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+            auth: {
+                user: process.env.VAR_EMAIL,
+                pass: process.env.VAR_PASS
+            }
+        });
+    transporter.sendMail({
+      from: '"BOYKO-CRM SYSTEM" <nodejs@example.com>',
+      to: req.body.email,
+      subject: "Востановление пароля",
+      text: "Востановление пароля",
+      html: `<body style="background: linear-gradient(90deg, rgba(2,0,36,1) 40%, rgba(255,0,39,1) 100%); margin: 0;padding: 0; font-family: 'Montserrat', sans-serif;">
+             <div style="width: 70%; margin: 200px auto;height: 400px;background: rgba(255, 255, 255, 0.2);text-align: center;color: white;">
+             <h3 style="margin: 0;padding-top: 20px;">BOYKO-CRM SYSTEM</h3>
+            <p>Вы только что запросили востановление пароля! Ваш новый пароль <span style="background: black;">${pass}</span>.</p>
+            <p>Спасибо что пользуетесь услугами BOYKO-CRM SYSTEM</p>
+                                                            </div>
+            </body>`
+    });
+
+    return res.status(200).json({
+        title:'succses'
     })
 })
 
@@ -754,6 +838,7 @@ app.post('/api/report', (req, res, next)=>{
 
     })
 })
+
 // Задаем порт
 const port = process.env.PORT || 5000;
 

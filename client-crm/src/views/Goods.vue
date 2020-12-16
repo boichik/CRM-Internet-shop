@@ -5,7 +5,10 @@
             <hr>
         </div>
         <Loader v-if="loading"/>
-        <p class="warn-text" v-else-if="!goods.length">На данный момент товаров еще нет</p>
+		<section v-else-if="!goods.length" class="app-table">
+            <h4>На данный момент товаров еще нет</h4>
+            <p>Для работы з сервесом ознакомтесь по <router-link to="/api">ссылке</router-link></p>
+        </section>
         <section v-else class="app-table">
             	<div class="row tools-container">
 					<div class="page-select-container col s4 m4 l2 xl1">
@@ -71,7 +74,10 @@ import  {required} from 'vuelidate/lib/validators'
 import paginationMixin from "@/mixins/pagination.mixin"
 import GoodsTable from "@/components/GoodsTable"
 export default {
-    name: 'goods',
+	name: 'goods',
+	metaInfo:{
+        title: 'Товары | BOYKO-CRM'
+    },
     data:()=>({
         select:null,
         goods:[],
@@ -89,13 +95,15 @@ export default {
     },
     components:{
         GoodsTable
-    },
-    async mounted(){
-	  this.goods = await this.$store.dispatch('fetchGoods')
-	//   this.select = M.FormSelect.init(this.$refs.select)
-    //   M.updateTextFields()
-	  this.Allgoods = this.goods
-	  this.renderGoods()
+	},
+	async created(){
+		this.goods = await this.$store.dispatch('fetchGoods')
+		this.Allgoods = this.goods
+	  	this.renderGoods()
+	},
+    mounted(){
+	  this.select = M.FormSelect.init(this.$refs.select)
+      M.updateTextFields()
     },
     methods:{
 		renderGoods(){

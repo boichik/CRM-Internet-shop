@@ -17,16 +17,8 @@
                     <form @submit.prevent="submitHandler">
                         <div class="row">
                             <div class="input-field col s12">
-                                    <input  id="article_good" type="text" class="validate" disabled :value="this.article_good">
+                                    <input  id="article_good" type="text" class="validate"  v-model.trim="this.article_good">
                                     <label for="article_good">Артикул</label>
-                            </div>
-                            <div class="input-field col s12">
-                                    <input  id="delivery" type="text" class="validate" disabled :value="'test'">
-                                    <label for="delivery">Доставка</label>
-                            </div>
-                            <div class="input-field col s12">
-                                    <input  id="address" type="text" class="validate" disabled :value="'Test, Grushevskogo 23'">
-                                    <label for="address">Адресс</label>
                             </div>
                             <div class="input-field col s12">
                                     <input  id="costs" type="text" class="validate" v-model.trim="this.costs">
@@ -41,7 +33,7 @@
                                     <label for="g_phone">Телефон</label>
                             </div>
                         </div>
-                        <button class="btn col s6 offset-s3" type="submit" name="action">Отправить</button>
+                        <button class="btn col s6 offset-s3" type="submit">Отправить</button>
                     </form>
                 </div>
                 <div id="test2" class="col s4 offset-s4">
@@ -97,6 +89,9 @@
 <script>
 export default {
     name:'testgood',
+    metaInfo:{
+      title: 'Тест сервиса | BOYKO-CRM'
+    },
     data:()=>({
         tabs:null,
         api:'',
@@ -119,44 +114,41 @@ export default {
         bio:'',
         phone:'',
     }),
-    async mounted(){
-        if(!Object.keys(this.$store.getters.info).length){
+    async created(){
+       if(!Object.keys(this.$store.getters.info).length){
             await this.$store.dispatch('fetchInfo')
         }
         this.api = await this.$store.getters.info.api_key
+    },
+    mounted(){
         this.tabs = M.Tabs.init(this.$refs.tabs)
-        M.updateTextFields()
-       
+        M.updateTextFields()   
     },
     methods:{
-       async submitHandler(){
+        async submitHandler(){
             var data = new Date()
-           const order={
-            order_date: data,
-            costs:this.costs,
-            article_good:this.article_good,
-            count:"1",
-            delivery:'test',
-            comment:'test',
-            bio:this.g_bio,
-            phone:this.g_phone,
-            email:'test@gmail.com',
-            address:"Test, Grushevskogo 23"
-           }
-           const API_KEY = this.api
-          // const API_KEY='3b537b9c7cf8eec5506c56469b998bfaa7596a88'
+            const order={
+                order_date: data,
+                costs:this.costs,
+                article_good:this.article_good,
+                count:"1",
+                delivery:'test',
+                comment:'test',
+                bio:this.g_bio,
+                phone:this.g_phone,
+                email:'test@gmail.com',
+                address:"Test, Grushevskogo 23"
+            }
+            const API_KEY = this.api
             this.$axios.create({baseURL:'http://localhost:5000'})
                 .post('/api/addOrder', {API_KEY,order})
                 .then(res =>{
-                    console.log(res.data.title)
-                  }, err =>{
-                      console.log(err.title)
-                  })
-            this.order_date= '',
-            this.costs='',
-            this.article_good='',
-            this.bio=''
-       
+                    console.log(res)
+                    this.order_date= '',
+                    this.costs='',
+                    this.article_good='',
+                    this.bio=''
+                })
         },
         async submitGood(){
             const good={

@@ -1,6 +1,6 @@
 <template>
     <div class="detail-block" :class="[order.statusColor]" >
-        <p>Дата : {{order.order_date}}</p>
+        <p>Дата : {{order.order_date | date('date')}}</p>
         <p>Cумма : {{order.costs}}</p>
         <p>Артикул товара : {{order.article_good}}</p>
         <p>Количество : {{order.count}}</p>

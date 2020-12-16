@@ -222,6 +222,9 @@
 <script>
 export default {
     name:'wiki',
+    metaInfo:{
+      title: 'Запросы | BOYKO-CRM'
+    },
     data:()=>({
       collapsible : null,
       host:'localhost:5000'

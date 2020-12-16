@@ -275,6 +275,9 @@
 /* eslint-disable */
 export default {
     name:'apiexample',
+    metaInfo:{
+      title: 'Примеры | BOYKO-CRM'
+    },
     data:()=>({
         tabs:null,
         userInfo:[],

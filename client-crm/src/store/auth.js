@@ -7,13 +7,11 @@ export default{
         try{
             await HTTP.post('/login', user)
                       .then(res =>{
-                        localStorage.setItem('token', res.data.token);
-                        }, err =>{
-                            console.log(err)
-                        })
+                        localStorage.setItem('token', res.data.token)
+                      })
         }
         catch(e){
-            console.log(e)
+          return e.response.status
         }   
     },
    logout({dispatch,commit}){
@@ -37,14 +35,22 @@ export default{
      }
    },
    async register({dispatch, commit}, newUser){
-     try{
-          await HTTP.post('/register', newUser)
-
+     try{    
+          await HTTP.post('/register', newUser).then(res=>{return res.status}) 
         }
         catch(e){
-          console.log(e)
+          return e.response.status
         }
-   }
+   },
+   async recovery({dispatch, commit}, email){
+    try{
+         await HTTP.post('/recovery', email).then(res=> {return res.response.status})
+         
+       }
+       catch(e){
+         return e.response.status
+       }
+  },
 
   }
 }

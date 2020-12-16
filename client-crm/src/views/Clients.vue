@@ -5,7 +5,10 @@
 				<hr>
 			</div>
 			<Loader v-if="loading"/>
-			<p class="warn-text" v-else-if="!clients.length">На данный момент клиентов еще нет</p>
+			<section v-else-if="!clients.length" class="app-table">
+				<h4>На данный момент клиентов еще нет</h4>
+				<p>Для работы з сервесом ознакомтесь по <router-link to="/api">ссылке</router-link></p>
+			</section>
 			<section v-else class="app-table">
 				<div class="row tools-container">
 					<div class="page-select-container col s4 m3 l2 xl1">
@@ -70,6 +73,9 @@ import paginationMixin from "@/mixins/pagination.mixin"
 import ClientsTable from '@/components/ClientsTable'
 export default {
 	name:'clients',
+	metaInfo:{
+        title: 'Клиенты | BOYKO-CRM'
+    },
 	data:()=>({
 	   clients:[],
 	   select:null,
@@ -84,13 +90,15 @@ export default {
 	validations:{
       searchIn:{required},
       serchText:{required}
-    },
-	async mounted(){
-	  this.clients = await this.$store.dispatch('fetchCostumers')
+	},
+	async created(){
+		this.clients = await this.$store.dispatch('fetchCostumers')
+		this.Allclients = this.clients
+		this.renderComponent()
+	},
+	mounted(){  
 	  this.select = M.FormSelect.init(this.$refs.select)
 	  M.updateTextFields()
-	  this.Allclients = this.clients
-	  this.renderComponent()
 	},
 	methods:{
       renderComponent(){

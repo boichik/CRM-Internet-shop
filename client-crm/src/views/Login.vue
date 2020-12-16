@@ -8,9 +8,13 @@
                    type="email" 
                    class="validate"
                    v-model.trim="email"
-                   :class="{invalid: ($v.email.$dirty && !$v.email.required) || ($v.email.$dirty && !$v.email.email)}"
+                   :class="{invalid: ($v.email.$dirty && !$v.email.required) || ($v.email.$dirty && !$v.email.email)|| (error==404)}"
                 >
                 <label for="email_inline">Email</label>
+                <span 
+                    v-if="error==404"
+                    class="helper-text invalid left"
+                >Пользователя с таким емейлом не существует</span>
                 <span 
                     v-if="$v.email.$dirty && !$v.email.email"
                     class="helper-text invalid left"
@@ -26,9 +30,13 @@
                    type="password"
                    class="validate"
                    v-model="password"
-                   :class="{invalid: ($v.password.$dirty && !$v.password.required) || ($v.password.$dirty && !$v.password.minLength)}"
+                   :class="{invalid: ($v.password.$dirty && !$v.password.required) || ($v.password.$dirty && !$v.password.minLength) || (error==401)}"
                 >
                 <label for="pass_inline">Пароль</label>
+                <span 
+                    v-if="error==401"
+                    class="helper-text invalid left"
+                >Неправильный пароль</span>
                 <span 
                     v-if="$v.password.$dirty && !$v.password.required"
                     class="helper-text invalid left"
@@ -55,10 +63,14 @@ import { request } from 'http'
 import  {email, required, minLength} from 'vuelidate/lib/validators'
 export default {
     name: 'Login',
+    metaInfo:{
+        title: 'Вход | BOYKO-CRM'
+    },
     data(){
         return{
             email:'',
-            password:''
+            password:'',
+            error:''
         }
     },
     validations:{
@@ -77,10 +89,13 @@ export default {
                 password:this.password
             }
             try{
-               await this.$store.dispatch('login', user).then(()=>this.$router.push('/'))            
+               await this.$store.dispatch('login', user).then(res=>{
+                    if(res==401) this.error = 401
+                    if(res==404) this.error = 404
+                    else this.$router.push('/')             
+               })            
             }
             catch(e){
-                console.log(e)
             }  
         }
     }

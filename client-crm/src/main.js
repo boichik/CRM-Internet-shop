@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
+import VueMeta from 'vue-meta'
 import Vuelidate from 'vuelidate'
 import router from './router'
 import store from './store'
@@ -14,6 +15,7 @@ import Loader from '@/components/app/Loader'
 Vue.component('Paginate', Paginate)
 Vue.prototype.$axios = axios
 Vue.use(Vuelidate)
+Vue.use(VueMeta)
 Vue.use(M)
 Vue.config.productionTip = false
 Vue.filter('order', orderFilter)

@@ -22,9 +22,13 @@
                    type="email" 
                    class="validate"
                    v-model.trim="email"
-                   :class="{invalid: ($v.email.$dirty && !$v.email.required) || ($v.email.$dirty && !$v.email.email)}"
+                   :class="{invalid: ($v.email.$dirty && !$v.email.required) || ($v.email.$dirty && !$v.email.email) || (error==409)}"
                 >
                 <label for="email_inline">Email</label>
+                <span 
+                    v-if="error==409"
+                    class="helper-text invalid left"
+                >Пользователь с таким емейлом уже существует</span>
                 <span 
                     v-if="$v.email.$dirty && !$v.email.email"
                     class="helper-text invalid left"
@@ -87,12 +91,16 @@ import Axios from 'axios'
 import  {email, required, minLength, sameAs} from 'vuelidate/lib/validators'
 export default {
     name: 'Register',
+    metaInfo:{
+        title: 'Регестрация | BOYKO-CRM'
+    },
     data:() =>({      
         name:'',
         email:'',
         password:'',
         confimpassword:'',
-        check:false    
+        check:false ,
+        error:null,   
     }),
     validations:{
       name:{required},
@@ -115,12 +123,15 @@ export default {
                 password:this.password
             }
             try{
-               await this.$store.dispatch('register', newUser).then(
-                    await this.$store.dispatch('login', newUser).then(()=>this.$router.push('/'))     
-               )       
+               await this.$store.dispatch('register', newUser).then(res=>{           
+                 if(res==409){
+                      this.error = 409
+                     return 
+                 }
+                 this.$router.push('/login')                  
+               })                 
             }
             catch(e){
-                console.log(e)
             }  
            
         }

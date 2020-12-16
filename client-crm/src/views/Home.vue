@@ -1,125 +1,73 @@
 <template>
     <div class="app-page-container">
+        
         <div class="page-title">
             <h2>Главная</h2>
             <hr>
         </div>
-        <section class="app-table">
-            <div class="graph">
-                <canvas ref="canvas"></canvas>
-            </div>
+        <Loader v-if="loading"/>
+        <section v-else-if="notItem" class="app-table">
+            <h4>На данный момент статистика не доступна</h4>
+            <p>Для работы з сервесом ознакомтесь по <router-link to="/api">ссылке</router-link></p>
+        </section>
+        <section v-else class="app-table m-row">
+            <HomeChart v-if="reports.length!=0" :reports="reports"/>
+            <HomeTable :tableItem="tableItem"/>
         </section>
     </div>
 </template>
 <script>
+import HomeTable from '@/components/HomeTable'
+import HomeChart from '@/components/HomeChart'
 
-import { Bar } from 'vue-chartjs'
 export default {
     name: 'Home',
-    extends: Bar,
+    metaInfo:{
+        title: 'Главная | BOYKO-CRM'
+    },
     data:()=>({
       reports:[],
       orders:[],
       goods:[],
       newReport:[],
       userInfo:[],
+      tableItem:[],
+      loading:true,
+      notItem: false
     }),
-
-    mounted(){
+    components:{
+       HomeTable, HomeChart
+    },
+    created(){
         this.renderHome()
+    },
+    mounted(){
+        
     },
     methods:{
        async renderHome(){
            this.orders = await this.$store.dispatch('fetchOrders')
            this.goods = await this.$store.dispatch('fetchGoods')
            this.userInfo = this.$store.getters.info.lastReport
-
-           if(this.userInfo.slice(0,7) != new Date().toISOString().slice(0,7)){
-              this.createNewReport()
-           }else{
-               this.updateReport()
+           if(this.orders.length==0 | this.goods.length==0){
+               this.notItem=true
            }
-           
-           this.reports = await this.$store.dispatch('fetchReports')
+           else{
+                if(this.userInfo.slice(0,7) != new Date().toISOString().slice(0,7)){
+                    this.createNewReport()
+                }else{
+                    this.updateReport()
+                }
+                
+                this.reports = await this.$store.dispatch('fetchReports')
 
-           this.renderChart({
-               labels: this.reports.map(r => r.report_date.slice(0,7)),
-               datasets:[
-                    {
-                            label : 'Доходы за месяц',
-                            data: this.reports.map( r =>{
-                                return r.income
-                            }),
-                            backgroundColor: [
-                                'rgba(38, 215, 20, 0.5)',
-                                'rgba(38, 215, 20, 0.5)',
-                                'rgba(38, 215, 20, 0.5)',
-                                'rgba(38, 215, 20, 0.5)',
-                                'rgba(38, 215, 20, 0.5)',
-                                'rgba(38, 215, 20, 0.5)',
-                                'rgba(38, 215, 20, 0.5)',
-                                'rgba(38, 215, 20, 0.5)',
-                                'rgba(38, 215, 20, 0.5)',
-                                'rgba(38, 215, 20, 0.5)',
-                                'rgba(38, 215, 20, 0.5)',
-                                'rgba(38, 215, 20, 0.5)',
+                this.renderHomeTable()
+           }
+           this.loading = false
 
-                            ],
-                            borderColor: [
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                            ],
-                            borderWidth: 1
-                    },
-                    {
-                            label : 'Возможный доход',
-                            data: this.reports.map( r =>{
-                                return r.possible
-                            }),
-                            backgroundColor: [
-                                'rgba(255, 0, 0, 0.5)',
-                                'rgba(255, 0, 0, 0.5)',
-                                'rgba(255, 0, 0, 0.5)',
-                                'rgba(255, 0, 0, 0.5)',
-                                'rgba(255, 0, 0, 0.5)',
-                                'rgba(255, 0, 0, 0.5)',
-                                'rgba(255, 0, 0, 0.5)',
-                                'rgba(255, 0, 0, 0.5)',
-                                'rgba(255, 0, 0, 0.5)',
-                                'rgba(255, 0, 0, 0.5)',
-                                'rgba(255, 0, 0, 0.5)',
-                                'rgba(255, 0, 0, 0.5)',
-                            ],
-                            borderColor: [
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                                'rgba(0, 0, 0, 1)',
-                            ],
-                            borderWidth: 1
-                    }
-                ]
-           })
-
-
+       },
+       async renderHomeTable(){
+           this.tableItem = this.orders.filter(order=> order.order_date.slice(0,7) === new Date().toISOString().slice(0,7))
        },
        async createNewReport(){
            //Добавить обработку

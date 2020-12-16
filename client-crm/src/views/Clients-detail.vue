@@ -18,26 +18,29 @@ import CdetailBlock from "@/components/clients-detail/CdetailBlock"
 import CdetailTable from "@/components/clients-detail/CdetailTable"
 
 export default {
-  name: 'clients-detail',
-  data:()=>({
-    client:{},
-    orders:[],
-    loading:true
-  }),	
-  async mounted(){
-	  this.createObject()			
-  },
-  components:{
-	  CdetailBlock, CdetailTable
-  },
-  methods:{
-	 async createObject(){
-			const id = this.$route.params.id
-      this.client = await this.$store.dispatch('fetchCostumerById', id)	
-      this.orders = this.client.orders
-      this.loading=false
-         
-	  },
-  }
+    name: 'clients-detail',
+    metaInfo:{
+        title: 'О клиенте | BOYKO-CRM'
+    },
+    data:()=>({
+      client:{},
+      orders:[],
+      loading:true
+    }),	
+    async mounted(){
+      this.createObject()			
+    },
+    components:{
+      CdetailBlock, CdetailTable
+    },
+    methods:{
+    async createObject(){
+        const id = this.$route.params.id
+        this.client = await this.$store.dispatch('fetchCostumerById', id)	
+        this.orders = this.client.orders
+        this.loading=false
+          
+      },
+    }
 }
 </script>

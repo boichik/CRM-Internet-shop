@@ -16,28 +16,31 @@
 import GdetailBlock from "@/components/goods-detail/GdetailBlock"
 
 export default {
-  name: 'goods-detail',
-  data:()=>({
-    good:{},
-    loading:true
-  }),	
-  async mounted(){
-	  this.create()			
-  },
-  components:{
-	  GdetailBlock
-  },
-  methods:{
-	 async create(){
-	  const id = this.$route.params.id
-      this.good = await this.$store.dispatch('fetchGoodById', id)	
-      this.loading=false
-         
+    name: 'goods-detail',
+    metaInfo:{
+        title: 'О товаре | BOYKO-CRM'
     },
-    updateGdetail(){
-      this.loading = true
-       this.create()
+    data:()=>({
+      good:{},
+      loading:true
+    }),	
+    async mounted(){
+      this.create()			
+    },
+    components:{
+      GdetailBlock
+    },
+    methods:{
+    async create(){
+      const id = this.$route.params.id
+        this.good = await this.$store.dispatch('fetchGoodById', id)	
+        this.loading=false
+          
+      },
+      updateGdetail(){
+        this.loading = true
+        this.create()
+      }
     }
-  }
 }
 </script>

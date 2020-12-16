@@ -9,7 +9,7 @@
         </thead>
         <tbody>
             <tr v-for="ord of status" :key="ord.id">
-                <th>{{ord.changes_date}}</th>
+                <th>{{ord.changes_date | date('date')}}</th>
                 <th>{{ord.status_now | order('text')}}
                 </th>
                 <th>{{ord.comnt}}</th>

@@ -5,7 +5,10 @@
 				<hr>
 			</div>
 			<Loader v-if="loading"/>
-			<p class="warn-text" v-else-if="!orders.length">На данный момент заказов еще нет</p>
+			<section v-else-if="!orders.length" class="app-table">
+				<h4>На данный момент заказов еще нет</h4>
+				<p>Для работы з сервесом ознакомтесь по <router-link to="/api">ссылке</router-link></p>
+			</section>
 			<section v-else class="app-table">
 				<div class="row tools-container">
 					<div class="page-select-container col s4 m3 l2 xl1">
@@ -84,6 +87,9 @@ import paginationMixin from "@/mixins/pagination.mixin"
 import OrdersTable from "@/components/OrdersTable"
 export default {
 	name: 'orders',
+	metaInfo:{
+        title: 'Заказы | BOYKO-CRM'
+    },
 	data:()=>({
 	   select:null,
 	   orders:[],
@@ -100,17 +106,19 @@ export default {
 	validations:{
       searchIn:{required},
       serchText:{required}
-    },
+	},
+	async created(){
+	  	this.orders = await this.$store.dispatch('fetchOrders')
+		this.Allorders = this.orders
+	  	this.renderOrder()
+	},
 	async mounted(){
-	  this.orders = await this.$store.dispatch('fetchOrders')
-	  this.select = M.FormSelect.init(this.$refs.select)
-      M.updateTextFields()
-	  //console.log(orders[0].status[length+1].status_now)
-	  this.Allorders = this.orders
-	  this.renderOrder()
+	  	this.select = M.FormSelect.init(this.$refs.select)
+      	M.updateTextFields()
+
 	},
 	components:{
-      OrdersTable
+      	OrdersTable
 	},
 	methods:{
 		renderOrder(){
